@@ -32,7 +32,8 @@ jobs:
 
     - name: Run MLflow Project (Training)
       run: |
-        mlflow run MLProject
+        cd MLProject
+        mlflow run . --no-conda
 
     - name: Build Docker Image with MLflow
       run: |
