@@ -1,14 +1,12 @@
 import pandas as pd
 import mlflow
 import mlflow.sklearn
-import dagshub
 import json
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix
-
 
 # ======================
 # LOAD DATA
@@ -23,24 +21,57 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # ======================
-# TRAIN & LOGGING
+# TRAIN (TANPA start_run)
 # ======================
-with mlflow.start_run() as run:
-    model = LogisticRegression(max_iter=1000)
-    model.fit(X_train, y_train)
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
 
-    y_pred = model.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
+y_pred = model.predict(X_test)
+acc = accuracy_score(y_test, y_pred)
 
-    mlflow.log_metric("accuracy", acc)
-    mlflow.log_param("model_type", "LogisticRegression")
-    mlflow.log_param("max_iter", 1000)
-    mlflow.log_param("test_size", 0.2)
+# ======================
+# LOGGING (PAKAI RUN OTOMATIS)
+# ======================
+mlflow.log_metric("accuracy", acc)
 
-    mlflow.sklearn.log_model(model, "model")
+mlflow.log_param("model_type", "LogisticRegression")
+mlflow.log_param("max_iter", 1000)
+mlflow.log_param("test_size", 0.2)
 
-    print("Training done, acc:", acc)
+# ---- Artifact 1: Confusion Matrix ----
+cm = confusion_matrix(y_test, y_pred)
+plt.figure(figsize=(5, 4))
+plt.imshow(cm)
+plt.title("Confusion Matrix")
+plt.colorbar()
+plt.tight_layout()
+plt.savefig("training_confusion_matrix.png")
+plt.close()
 
-    # SAVE RUN_ID FOR CI
-    with open("run_id.txt", "w") as f:
-        f.write(run.info.run_id)
+mlflow.log_artifact("training_confusion_matrix.png")
+
+# ---- Artifact 2: Metric Info JSON ----
+metric_info = {
+    "accuracy": acc,
+    "model": "LogisticRegression",
+    "dataset": "telco_preprocessed.csv"
+}
+
+with open("metric_info.json", "w") as f:
+    json.dump(metric_info, f, indent=4)
+
+mlflow.log_artifact("metric_info.json")
+
+# ---- MODEL (INI YANG DICARI DOCKER) ----
+mlflow.sklearn.log_model(model, "model")
+
+# ======================
+# SAVE RUN_ID UNTUK CI
+# ======================
+run_id = mlflow.active_run().info.run_id
+with open("run_id.txt", "w") as f:
+    f.write(run_id)
+
+print("Training done")
+print("Accuracy:", acc)
+print("Run ID:", run_id)
