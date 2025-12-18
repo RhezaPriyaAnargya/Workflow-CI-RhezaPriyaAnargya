@@ -36,11 +36,12 @@ jobs:
     - name: Read run_id from training
       run: |
         echo "RUN_ID=$(cat MLProject/run_id.txt)" >> $GITHUB_ENV
+        echo "Using RUN_ID=$RUN_ID"
 
     - name: Build Docker Image with MLflow
       run: |
         mlflow models build-docker \
-          -m "runs:/${RUN_ID}/artifacts/model" \
+          -m "runs:/${RUN_ID}/model" \
           -n rhezapa/telco-churn-serving
 
     - name: Login to Docker Hub
