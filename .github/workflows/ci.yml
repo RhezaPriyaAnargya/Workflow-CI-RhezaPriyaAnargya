@@ -33,7 +33,7 @@ jobs:
     - name: Run MLflow Project (Training)
       run: |
         cd MLProject
-        mlflow run . 
+        mlflow run . --no-conda
 
     - name: Get latest MLflow run_id
       run: |
