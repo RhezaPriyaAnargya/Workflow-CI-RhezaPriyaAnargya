@@ -23,8 +23,6 @@ jobs:
         pip install mlflow dagshub scikit-learn pandas matplotlib
 
     - name: Set MLflow Tracking (DagsHub)
-      env:
-        DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
       run: |
         echo "MLFLOW_TRACKING_URI=https://dagshub.com/RhezaPriyaAnargya/telco-churn-mlflow.mlflow" >> $GITHUB_ENV
         echo "MLFLOW_TRACKING_USERNAME=RhezaPriyaAnargya" >> $GITHUB_ENV

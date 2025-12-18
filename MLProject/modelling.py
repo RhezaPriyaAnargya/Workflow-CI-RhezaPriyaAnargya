@@ -9,14 +9,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-# ======================
-# DAGSHUB (ONLINE MLFLOW)
-# ======================
-dagshub.init(
-    repo_owner="RhezaPriyaAnargya",
-    repo_name="telco-churn-mlflow",
-    mlflow=True
-)
 
 # ======================
 # LOAD DATA
