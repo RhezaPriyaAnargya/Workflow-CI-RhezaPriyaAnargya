@@ -25,49 +25,22 @@ X_train, X_test, y_train, y_test = train_test_split(
 # ======================
 # TRAIN & LOGGING
 # ======================
-with mlflow.start_run():
+with mlflow.start_run() as run:
     model = LogisticRegression(max_iter=1000)
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
     acc = accuracy_score(y_test, y_pred)
 
-    # ---- Metrics ----
     mlflow.log_metric("accuracy", acc)
-
-    # ---- Params ----
     mlflow.log_param("model_type", "LogisticRegression")
     mlflow.log_param("max_iter", 1000)
     mlflow.log_param("test_size", 0.2)
 
-    # ---- Confusion Matrix (Artifact 1) ----
-    cm = confusion_matrix(y_test, y_pred)
-
-    plt.figure(figsize=(5, 4))
-    plt.imshow(cm)
-    plt.title("Confusion Matrix")
-    plt.xlabel("Predicted")
-    plt.ylabel("Actual")
-    plt.colorbar()
-    plt.tight_layout()
-    plt.savefig("training_confusion_matrix.png")
-    plt.close()
-
-    mlflow.log_artifact("training_confusion_matrix.png")
-
-    # ---- Metric Info JSON (Artifact 2) ----
-    metric_info = {
-        "accuracy": acc,
-        "model": "LogisticRegression",
-        "dataset": "telco_preprocessed.csv"
-    }
-
-    with open("metric_info.json", "w") as f:
-        json.dump(metric_info, f, indent=4)
-
-    mlflow.log_artifact("metric_info.json")
-
-    # ---- Model ----
     mlflow.sklearn.log_model(model, "model")
 
     print("Training done, acc:", acc)
+
+    # SAVE RUN_ID FOR CI
+    with open("run_id.txt", "w") as f:
+        f.write(run.info.run_id)
