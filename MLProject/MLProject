@@ -1,4 +1,4 @@
-name: telco-churn-serving
+name: telco-churn-ci
 
 conda_env: conda.yaml
 
