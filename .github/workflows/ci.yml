@@ -13,7 +13,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up Python
+    - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
         python-version: "3.10"
@@ -28,17 +28,17 @@ jobs:
         echo "MLFLOW_TRACKING_USERNAME=RhezaPriyaAnargya" >> $GITHUB_ENV
         echo "MLFLOW_TRACKING_PASSWORD=${{ secrets.DAGSHUB_TOKEN }}" >> $GITHUB_ENV
 
-    - name: Run MLflow Project (Training)
+    - name: Run mlflow project
       run: |
         cd MLProject
         mlflow run . --env-manager=local
 
-    - name: Read run_id from training
+    - name: Get latest MLflow run_id
       run: |
         echo "RUN_ID=$(cat MLProject/run_id.txt)" >> $GITHUB_ENV
         echo "Using RUN_ID=$RUN_ID"
 
-    - name: Build Docker Image with MLflow
+    - name: Build Docker Model
       run: |
         cd MLProject
         mlflow models build-docker \
